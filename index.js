@@ -5,6 +5,7 @@ let yaddress = []
 let zaddress = []
 let country = []
 let xaddress = []
+let imag = []
 Plotly.d3.json(url, function(json){
     var link = json['links'];
     var nodes = json['nodes'];
@@ -13,6 +14,14 @@ Plotly.d3.json(url, function(json){
         yaddress.push(Math.random()* (nodes.length + 1));
         zaddress.push(Math.random()* (nodes.length + 1));
         country.push(nodes[i]['country'])
+        imag.push(
+            {"source" : "https://flags.fmcdn.net/data/flags/w1160/"+ nodes[i]["code"]+".png",
+            "x": i,
+            "y": yaddress[yaddress.length - 1],
+            "z": zaddress[zaddress.length - 1],
+            "sizex": 0.2,
+            "sizey": 0.2,}
+            )
     }
      for (var i=0; i<link.length; i++){
      let trace = {
@@ -35,7 +44,7 @@ Plotly.d3.json(url, function(json){
         z : zaddress,
         hoverinfo: 'text',
         type: 'scatter3d',
-        //mode: 'markers',
+        marker: {size : 1},
         symbol: Plotly.Icons['coffee'],
         text: country
     }
@@ -45,64 +54,11 @@ Plotly.d3.json(url, function(json){
         hovermode:'closest',
         title:'Geographic Networks',
         xaxis:{zeroline:false, title: 'Value A'},
-        yaxis:{zeroline:false, title: 'Value B'}
+        yaxis:{zeroline:false, title: 'Value B'},
+        images: imag,
      };
-     
-    trace.on('plotly_hover', function(data){
-        var point = data.points[0],
-                       newAnnotation = {
-                         x: point.xaxis.d2l(point.x),
-                         y: point.yaxis.d2l(point.y),
-                         arrowhead: 6,
-                         ax: 0,
-                         ay: -80,
-                         bgcolor: 'rgba(255, 255, 255, 0.9)',
-                         arrowcolor: point.fullData.marker.color,
-                         font: {size:12},
-                         bordercolor: point.fullData.marker.color,
-                         borderwidth: 3,
-                         borderpad: 4,
-                         text: '<i>Some text will be added here...</i><br>',
-                         pointNum: point.pointNumber
-                       },
-                       newImage = {
-                         source: "<Path to some valid image>",
-                         xref: "x",
-                         yref: "y",
-                         x: point.xaxis.d2l(point.x),
-                         y: point.yaxis.d2l(point.y),
-                         sizex: point.xaxis.d2l(point.x)/36000,
-                         sizey: 10,
-                         xanchor: "left",
-                         yanchor: "bottom",
-                         pointNum: point.pointNumber
-                       },
-                       divid = document.getElementById('plantTimeseries'),
-                       newIndex = (divid.layout.annotations || []).length;
-                       console.log(newIndex);
-                   // delete instead if clicked twice
-                   if(newIndex) {
-                     var foundCopy = false;
-                     divid.layout.annotations.forEach(function(ann, sameIndex) {
-                       if(ann.pointNum === newAnnotation.pointNum ) {
-                         Plotly.relayout('plantTimeseries', 'annotations[' + sameIndex + ']', 'remove');
-                         Plotly.relayout('plantTimeseries', 'images[' + sameIndex + ']', 'remove');
-                         foundCopy = true;
-                         console.log(divid.layout.annotations.length);
-                       }
-                     });
-                     if(foundCopy){
-                       return;
-                     }
-                   }
-                  Plotly.relayout('plantTimeseries', 'annotations[' + newIndex + ']', newAnnotation);
-                  Plotly.relayout('plantTimeseries', 'images[' + newIndex + ']', newImage);
-                  console.log(divid.layout.annotations.length);
-                 }
-               }
-             });
-    })
-   
+ 
+ console.log(imag)
 Plotly.plot('graph',data,layout);
 
 
